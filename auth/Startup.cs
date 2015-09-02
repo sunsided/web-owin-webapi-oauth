@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using auth.Formats;
+using auth.Providers;
 using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
@@ -49,7 +51,7 @@ namespace auth
         public void ConfigureOAuth(IAppBuilder appBuilder)
         {
 
-            OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            var serverOptions = new OAuthAuthorizationServerOptions
             {
                 // For Dev enviroment only (on production should be AllowInsecureHttp = false)
 #if DEBUG
@@ -60,11 +62,11 @@ namespace auth
                 TokenEndpointPath = new PathString("/oauth2/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
                 Provider = new CustomOAuthProvider(),
-                AccessTokenFormat = new CustomJwtFormat("http://jwtauthzsrv.azurewebsites.net")
+                AccessTokenFormat = new CustomJwtFormat("http://jwtauthzsrv.azurewebsites.net") // TODO: Die ID des Issuers muss konfigurierbar sein
             };
 
             // OAuth 2.0 Bearer Access Token Generation
-            appBuilder.UseOAuthAuthorizationServer(OAuthServerOptions);
+            appBuilder.UseOAuthAuthorizationServer(serverOptions);
         }
     }
 }
