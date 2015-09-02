@@ -32,7 +32,8 @@ namespace auth
             // Da es sich dabei um eine Windows-API handelt, ist diese nicht unter Mono verfügbar.
             // Der folgende Aufruf setzt den Data Protector-Provider auf AES.
             // https://github.com/i4004/Owin.Security.AesDataProtectorProvider
-            appBuilder.UseAesDataProtectorProvider();
+            var encryptionKey = "my super secret encryption key"; // TODO: Key konfigurieren
+            appBuilder.UseAesDataProtectorProvider(encryptionKey);
 
             // Web API routes
             config.MapHttpAttributeRoutes();
