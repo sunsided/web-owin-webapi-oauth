@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using auth.Entities;
@@ -37,7 +38,7 @@ namespace auth
                 var baseAddress = $"http://localhost:{port}/";
                 var newAudienceName = "Something 9000";
 
-                PrintStatusMessage("Attempting to retrieve a bearer token for user sample audience ...", false);
+                PrintStatusMessage("Attempting to retrieve a bearer token for sample audience ...", false);
                 var requestTask = TestRequestToken(baseAddress, audienceId: "099153c2625149bc8ecb3e85e03f0022");
                 requestTask.Wait();
 
@@ -56,9 +57,9 @@ namespace auth
                 PrintStatusMessage("Attempting to retrieve a bearer token for a non-existing audience ...");
                 requestTask = TestRequestToken(baseAddress, audienceId: "something I just made up");
                 requestTask.Wait();
-            }
 
-            Console.ReadKey(true);
+                Console.ReadKey(true);
+            }
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace auth
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="clearLine">if set to <c>true</c> [clear line].</param>
-        private static void PrintStatusMessage(string message, bool clearLine = true)
+        private static void PrintStatusMessage([NotNull] string message, bool clearLine = true)
         {
             if (clearLine) Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -86,11 +87,6 @@ namespace auth
             // Create HttpCient and make a request to api/values
             using (var client = new HttpClient())
             {
-                var audienceModel = JsonConvert.SerializeObject(new
-                {
-                    Name = "Something 9000"
-                });
-
                 var request = new FormUrlEncodedContent(new []
                                                             {
                                                                 new KeyValuePair<string, string>("username", "chucknorris"),
@@ -98,6 +94,8 @@ namespace auth
                                                                 new KeyValuePair<string, string>("grant_type", "password"),
                                                                 new KeyValuePair<string, string>("client_id", audienceId),
                                                             });
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var response = await client.PostAsync(baseAddress + "oauth2/token", request);
                 Console.WriteLine(response);
@@ -111,6 +109,7 @@ namespace auth
         /// Tests the API.
         /// </summary>
         /// <param name="baseAddress">The base address.</param>
+        /// <param name="friendlyName">The friendly name of the <see cref="Audience"/>.</param>
         /// <returns>The task that represents this operation.</returns>
         [NotNull]
         private static async Task<Audience> TestApi([NotNull] string baseAddress, [NotNull] string friendlyName)
