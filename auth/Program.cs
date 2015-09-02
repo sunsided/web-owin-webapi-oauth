@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
@@ -23,6 +24,8 @@ namespace auth
         /// <param name="args">The arguments.</param>
         internal static void Main([NotNull] string[] args)
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+
             var options = new StartOptions();
             const int port = 9001;
 
