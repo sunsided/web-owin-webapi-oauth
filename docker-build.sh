@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-docker build -t owin-test .
+ME=$(whoami)
+
+docker build -t ${ME}/owin-test .

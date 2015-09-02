@@ -9,7 +9,12 @@ Folgende Docker-Kommandos ausführen
 	docker build -t owin-test . 
 	docker run --rm -it -p 9000:9000 -p 9001:9001 owin-test
 
-wobei `owin-test` ein beliebiger Name für das neue Image ist.
+wobei `owin-test` ein beliebiger Name für das neue Image ist. Beide Befehle sind gekapselt in die Shellskripte
+
+	./docker-build.sh
+	./docker-run.sh
+
+wobei diese den Namen des bauenden Nutzers voranstellen, z.B. `mmayer/owin-test`.
 
 ## Fallstricke
 
