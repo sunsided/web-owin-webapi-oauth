@@ -28,6 +28,8 @@ namespace auth
         {
             var config = new HttpConfiguration();
 
+            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+
             // Die Vorgabe für Data Protection ist, den Data Protection API-Provider zu verwenden.
             // Da es sich dabei um eine Windows-API handelt, ist diese nicht unter Mono verfügbar.
             // Der folgende Aufruf setzt den Data Protector-Provider auf AES.
@@ -52,7 +54,7 @@ namespace auth
         /// <param name="appBuilder">
         /// The application builder.
         /// </param>
-        public void ConfigureOAuth(IAppBuilder appBuilder)
+        public void ConfigureOAuth([NotNull] IAppBuilder appBuilder)
         {
 
             var serverOptions = new OAuthAuthorizationServerOptions
