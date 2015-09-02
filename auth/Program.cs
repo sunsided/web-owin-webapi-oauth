@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Text;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Owin.Hosting;
+using Newtonsoft.Json;
 
 namespace auth
 {
@@ -27,7 +32,36 @@ namespace auth
             // Start the OWIN host
             using (WebApp.Start<Startup>(options))
             {
-                Console.ReadKey(true);
+                var baseAddress = $"http://localhost:{port}/";
+                var task = TestApi(baseAddress);
+                task.Wait();
+            }
+
+            Console.ReadKey(true);
+        }
+
+        /// <summary>
+        /// Tests the API.
+        /// </summary>
+        /// <param name="baseAddress">The base address.</param>
+        /// <returns>The task that represents this operation.</returns>
+        private static async Task TestApi([NotNull] string baseAddress)
+        {
+            // Create HttpCient and make a request to api/values
+            using (var client = new HttpClient())
+            {
+                var audienceModel = JsonConvert.SerializeObject(new
+                                                                    {
+                                                                        Name = "Something 9000"
+                                                                    });
+
+                var request = new StringContent(audienceModel, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(baseAddress + "api/audience", request);
+                Console.WriteLine(response);
+
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(content);
             }
         }
     }
