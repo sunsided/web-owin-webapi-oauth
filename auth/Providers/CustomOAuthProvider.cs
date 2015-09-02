@@ -240,10 +240,21 @@ namespace auth.Providers
         /// <returns>
         /// Task to enable asynchronous execution
         /// </returns>
-        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        public override async Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
             Console.WriteLine("In TokenEndpoint");
-            return base.TokenEndpoint(context);
+            try
+            {
+                var task = base.TokenEndpoint(context);
+                task.Wait();
+                Console.WriteLine("TokenEndpoint Done");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Caught exception in TokenEndpoint: {0}", e.Message);
+                Console.WriteLine(e.StackTrace);
+                throw;
+            }
         }
 
         /// <summary>
