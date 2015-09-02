@@ -61,6 +61,7 @@ namespace auth
         {
             var serverOptions = new OAuthAuthorizationServerOptions
             {
+                ApplicationCanDisplayErrors = true,
                 AllowInsecureHttp = true,                                                       // TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
                 AuthorizeEndpointPath = new PathString("/oauth2/authorize"),
                 TokenEndpointPath = new PathString("/oauth2/token"),
