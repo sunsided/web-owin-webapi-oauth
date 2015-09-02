@@ -25,6 +25,8 @@ namespace auth.Providers
         [NotNull]
         public override Task ValidateClientAuthentication([NotNull] OAuthValidateClientAuthenticationContext context)
         {
+            Console.WriteLine("Validating Client Authentication ...");
+
             // Client-ID und Client-Secret aus dem Kontext beziehen
             string clientId;
             string clientSecret;
@@ -61,13 +63,16 @@ namespace auth.Providers
         [NotNull]
         public override Task GrantResourceOwnerCredentials([NotNull] OAuthGrantResourceOwnerCredentialsContext context)
         {
+            Console.WriteLine("Grating Resource Owner credentials ...");
+
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
 
             // Dummy check here, you need to do your DB checks against membership system http://bit.ly/SPAAuthCode
             if (context.UserName != "chucknorris" || context.Password != "geheim")
             {
                 context.SetError("invalid_grant", "The user name or password is incorrect");
-                //return;
+                
+		Console.WriteLine("Credentials are invalid.");
                 return Task.FromResult<object>(null);
             }
 
@@ -91,8 +96,12 @@ namespace auth.Providers
                 });
 
             // Ticket erstellen und ab dafür
+            Console.WriteLine("Creating the ticket ...");
+
             var ticket = new AuthenticationTicket(identity, props);
             context.Validated(ticket);
+
+            Console.WriteLine("All is well!");
             return Task.FromResult<object>(null);
         }
     }
