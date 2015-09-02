@@ -27,11 +27,13 @@ namespace auth
         public void Configuration([NotNull] IAppBuilder appBuilder)
         {
             var config = new HttpConfiguration();
-
+	
+            /*
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             var traceWriter = config.EnableSystemDiagnosticsTracing();
             traceWriter.IsVerbose = true;
             traceWriter.MinimumLevel = System.Web.Http.Tracing.TraceLevel.Debug;
+            */
 
             // Die Vorgabe für Data Protection ist, den Data Protection API-Provider zu verwenden.
             // Da es sich dabei um eine Windows-API handelt, ist diese nicht unter Mono verfügbar.
