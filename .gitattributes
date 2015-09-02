@@ -1,0 +1,34 @@
+* text=auto
+
+*.cs text diff=csharp ident
+*.java text diff=java ident
+
+*.c text diff=cpp ident
+*.cpp text diff=cpp ident
+*.h text diff=cpp ident
+*.hpp text diff=cpp ident
+
+*.m text diff=matlab ident
+
+*.sln text eol=crlf
+*.vcproj text eol=crlf
+
+*.sh text eol=lf ident
+*.cmd text eol=crlf ident
+*.bat text eol=crlf ident
+
+*.ini text
+*.config text
+*.xml text
+
+*.jpg binary
+*.png binary
+*.gif binary
+
+*.tex text diff=tex
+*.bib text diff=bibtex
+
+*.html text diff=html
+
+*.dll binary
+*.exe binary
