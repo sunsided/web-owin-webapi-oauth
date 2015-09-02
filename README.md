@@ -13,3 +13,13 @@ wobei `owin-test` ein beliebiger Name für das neue Image ist.
 Als Einzeiler:
 
 	docker build -t owin-test . && docker run --rm owin-test
+
+## Fallstricke
+
+### Data Protection API
+
+Der standardmäßig eingestellte Protection Service für Daten beruhit auf der Data Protection API (DPAPI). Da es sich hierbei um eine Windows-API handelt, funktionieren diese Calls nicht unter Linux. Abhilfe schafft das Paket [Owin.Security.AesDataProtectorProvider](https://github.com/i4004/Owin.Security.AesDataProtectorProvider), welches mittels
+
+	app.UseAesDataProtectorProvider(...key...);
+
+eingebunden wird.
