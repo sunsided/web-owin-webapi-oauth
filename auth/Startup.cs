@@ -57,12 +57,7 @@ namespace auth
 
             var serverOptions = new OAuthAuthorizationServerOptions
             {
-                // For Dev enviroment only (on production should be AllowInsecureHttp = false)
-#if DEBUG
-                AllowInsecureHttp = true,
-#else
-                AllowInsecureHttp = false,
-#endif
+                AllowInsecureHttp = true,                                                       // TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
                 TokenEndpointPath = new PathString("/oauth2/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
                 Provider = new CustomOAuthProvider(),
