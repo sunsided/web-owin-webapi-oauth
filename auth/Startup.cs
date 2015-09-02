@@ -29,6 +29,7 @@ namespace auth
             var config = new HttpConfiguration();
 
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            config.EnableSystemDiagnosticsTracing();
 
             // Die Vorgabe für Data Protection ist, den Data Protection API-Provider zu verwenden.
             // Da es sich dabei um eine Windows-API handelt, ist diese nicht unter Mono verfügbar.
@@ -56,10 +57,10 @@ namespace auth
         /// </param>
         public void ConfigureOAuth([NotNull] IAppBuilder appBuilder)
         {
-
             var serverOptions = new OAuthAuthorizationServerOptions
             {
                 AllowInsecureHttp = true,                                                       // TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
+                AuthorizeEndpointPath = new PathString("/oauth2/authorize"),
                 TokenEndpointPath = new PathString("/oauth2/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
                 Provider = new CustomOAuthProvider(),
