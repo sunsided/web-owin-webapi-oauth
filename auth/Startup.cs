@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
+using Owin.Security.AesDataProtectorProvider;
 
 namespace auth
 {
@@ -26,6 +27,12 @@ namespace auth
         public void Configuration([NotNull] IAppBuilder appBuilder)
         {
             var config = new HttpConfiguration();
+
+            // Die Vorgabe für Data Protection ist, den Data Protection API-Provider zu verwenden.
+            // Da es sich dabei um eine Windows-API handelt, ist diese nicht unter Mono verfügbar.
+            // Der folgende Aufruf setzt den Data Protector-Provider auf AES.
+            // https://github.com/i4004/Owin.Security.AesDataProtectorProvider
+            appBuilder.UseAesDataProtectorProvider();
 
             // Web API routes
             config.MapHttpAttributeRoutes();
