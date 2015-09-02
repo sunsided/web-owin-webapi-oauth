@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using auth.Entities;
 using JetBrains.Annotations;
 using Microsoft.Owin.Hosting;
 using Newtonsoft.Json;
@@ -33,11 +35,76 @@ namespace auth
             using (WebApp.Start<Startup>(options))
             {
                 var baseAddress = $"http://localhost:{port}/";
-                var task = TestApi(baseAddress);
-                task.Wait();
+                var newAudienceName = "Something 9000";
+
+                PrintStatusMessage("Attempting to retrieve a bearer token for user sample audience ...", false);
+                var requestTask = TestRequestToken(baseAddress, audienceId: "099153c2625149bc8ecb3e85e03f0022");
+                requestTask.Wait();
+
+                PrintStatusMessage($"Attempting to register new audience '{newAudienceName}' ...");
+                var registerTask = TestApi(baseAddress, newAudienceName);
+                registerTask.Wait();
+                var audience = registerTask.Result;
+
+                if (audience != null)
+                {
+                    PrintStatusMessage($"Attempting to retrieve a bearer token for audience '{audience.Name}' ...");
+                    requestTask = TestRequestToken(baseAddress, audienceId: audience.ClientId);
+                    requestTask.Wait();
+                }
+
+                PrintStatusMessage("Attempting to retrieve a bearer token for a non-existing audience ...");
+                requestTask = TestRequestToken(baseAddress, audienceId: "something I just made up");
+                requestTask.Wait();
             }
 
             Console.ReadKey(true);
+        }
+
+        /// <summary>
+        /// Prints a status message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="clearLine">if set to <c>true</c> [clear line].</param>
+        private static void PrintStatusMessage(string message, bool clearLine = true)
+        {
+            if (clearLine) Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        /// <summary>
+        /// Versucht, ein Token zu beziehen.
+        /// </summary>
+        /// <param name="baseAddress">The base address.</param>
+        /// <param name="audienceId">The audience identifier.</param>
+        /// <returns>The task that represents this operation.</returns>
+        [NotNull]
+        private static async Task TestRequestToken([NotNull] string baseAddress, [NotNull] string audienceId)
+        {
+            // Create HttpCient and make a request to api/values
+            using (var client = new HttpClient())
+            {
+                var audienceModel = JsonConvert.SerializeObject(new
+                {
+                    Name = "Something 9000"
+                });
+
+                var request = new FormUrlEncodedContent(new []
+                                                            {
+                                                                new KeyValuePair<string, string>("username", "chucknorris"),
+                                                                new KeyValuePair<string, string>("password", "geheim"),
+                                                                new KeyValuePair<string, string>("grant_type", "password"),
+                                                                new KeyValuePair<string, string>("client_id", audienceId),
+                                                            });
+
+                var response = await client.PostAsync(baseAddress + "oauth2/token", request);
+                Console.WriteLine(response);
+
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(content);
+            }
         }
 
         /// <summary>
@@ -45,14 +112,15 @@ namespace auth
         /// </summary>
         /// <param name="baseAddress">The base address.</param>
         /// <returns>The task that represents this operation.</returns>
-        private static async Task TestApi([NotNull] string baseAddress)
+        [NotNull]
+        private static async Task<Audience> TestApi([NotNull] string baseAddress, [NotNull] string friendlyName)
         {
             // Create HttpCient and make a request to api/values
             using (var client = new HttpClient())
             {
                 var audienceModel = JsonConvert.SerializeObject(new
                                                                     {
-                                                                        Name = "Something 9000"
+                                                                        Name = friendlyName
                                                                     });
 
                 var request = new StringContent(audienceModel, Encoding.UTF8, "application/json");
@@ -62,7 +130,14 @@ namespace auth
 
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<Audience>(content);
+                }
             }
+
+            return null;
         }
     }
 }

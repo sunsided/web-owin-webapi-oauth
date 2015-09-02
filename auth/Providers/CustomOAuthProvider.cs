@@ -36,7 +36,7 @@ namespace auth.Providers
             // Wir erwarten eine gesetzte Client-ID
             if (context.ClientId == null)
             {
-                context.SetError("invalid_clientId", "client_Id is not set");
+                context.SetError("invalid_clientId", "client_id is not set");
                 return Task.FromResult<object>(null);
             }
 
@@ -44,7 +44,7 @@ namespace auth.Providers
             var audience = AudiencesStore.FindAudience(context.ClientId); // TODO ... async
             if (audience == null)
             {
-                context.SetError("invalid_clientId", $"Invalid client_id '{context.ClientId}'");
+                context.SetError("invalid_clientId", $"client_id '{context.ClientId}' is invalid");
                 return Task.FromResult<object>(null);
             }
 
@@ -63,17 +63,13 @@ namespace auth.Providers
         {
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
 
-            #region Validierung des Benutzers
-
             // Dummy check here, you need to do your DB checks against membership system http://bit.ly/SPAAuthCode
-            if (context.UserName != context.Password)
+            if (context.UserName != "chucknorris" || context.Password != "geheim")
             {
                 context.SetError("invalid_grant", "The user name or password is incorrect");
                 //return;
                 return Task.FromResult<object>(null);
             }
-
-            #endregion Validierung des Benutzers
 
             // Da die Daten des Ressourcenbesitzers gültig sind, stellen wir ein neues Token aus.
             var identity = new ClaimsIdentity("JWT");
