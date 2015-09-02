@@ -247,6 +247,10 @@ namespace auth.Providers
             {
                 var task = base.TokenEndpoint(context);
                 task.Wait();
+                if (task.Exception != null)
+                {
+                    throw task.Exception;
+                }
                 Console.WriteLine("TokenEndpoint Done");
             }
             catch (Exception e)
