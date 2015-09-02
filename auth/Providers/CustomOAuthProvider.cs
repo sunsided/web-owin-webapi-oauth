@@ -25,7 +25,7 @@ namespace auth.Providers
         [NotNull]
         public override Task ValidateClientAuthentication([NotNull] OAuthValidateClientAuthenticationContext context)
         {
-            Console.WriteLine("Validating Client Authentication ...");
+            Console.WriteLine("In ValidateClientAuthentication");
 
             // Client-ID und Client-Secret aus dem Kontext beziehen
             string clientId;
@@ -63,7 +63,7 @@ namespace auth.Providers
         [NotNull]
         public override Task GrantResourceOwnerCredentials([NotNull] OAuthGrantResourceOwnerCredentialsContext context)
         {
-            Console.WriteLine("Grating Resource Owner credentials ...");
+            Console.WriteLine("In GrantResourceOwnerCredentials");
 
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
 
@@ -71,8 +71,6 @@ namespace auth.Providers
             if (context.UserName != "chucknorris" || context.Password != "geheim")
             {
                 context.SetError("invalid_grant", "The user name or password is incorrect");
-                
-		Console.WriteLine("Credentials are invalid.");
                 return Task.FromResult<object>(null);
             }
 
@@ -100,9 +98,79 @@ namespace auth.Providers
 
             var ticket = new AuthenticationTicket(identity, props);
             context.Validated(ticket);
-
-            Console.WriteLine("All is well!");
             return Task.FromResult<object>(null);
+        }
+
+        public override Task AuthorizationEndpointResponse(OAuthAuthorizationEndpointResponseContext context)
+        {
+            Console.WriteLine("In AuthorizationEndpointResponse");
+            return base.AuthorizationEndpointResponse(context);
+        }
+
+        public override Task AuthorizeEndpoint(OAuthAuthorizeEndpointContext context)
+        {
+            Console.WriteLine("In AuthorizeEndpoint");
+            return base.AuthorizeEndpoint(context);
+        }
+
+        public override Task GrantAuthorizationCode(OAuthGrantAuthorizationCodeContext context)
+        {
+            Console.WriteLine("In GrantAuthorizationCode");
+            return base.GrantAuthorizationCode(context);
+        }
+
+        public override Task GrantClientCredentials(OAuthGrantClientCredentialsContext context)
+        {
+            Console.WriteLine("In GrantClientCredentials");
+            return base.GrantClientCredentials(context);
+        }
+
+        public override Task GrantCustomExtension(OAuthGrantCustomExtensionContext context)
+        {
+            Console.WriteLine("In GrantCustomExtension");
+            return base.GrantCustomExtension(context);
+        }
+
+        public override Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
+        {
+            Console.WriteLine("In GrantRefreshToken");
+            return base.GrantRefreshToken(context);
+        }
+
+        public override Task MatchEndpoint(OAuthMatchEndpointContext context)
+        {
+            Console.WriteLine("In MatchEndpoint");
+            return base.MatchEndpoint(context);
+        }
+
+        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        {
+            Console.WriteLine("In TokenEndpoint");
+            return base.TokenEndpoint(context);
+        }
+
+        public override Task TokenEndpointResponse(OAuthTokenEndpointResponseContext context)
+        {
+            Console.WriteLine("In TokenEndpointResponse");
+            return base.TokenEndpointResponse(context);
+        }
+
+        public override Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
+        {
+            Console.WriteLine("In ValidateAuthorizeRequest");
+            return base.ValidateAuthorizeRequest(context);
+        }
+
+        public override Task ValidateClientRedirectUri(OAuthValidateClientRedirectUriContext context)
+        {
+            Console.WriteLine("In ValidateClientRedirectUri");
+            return base.ValidateClientRedirectUri(context);
+        }
+
+        public override Task ValidateTokenRequest(OAuthValidateTokenRequestContext context)
+        {
+            Console.WriteLine("In ValidateTokenRequest");
+            return base.ValidateTokenRequest(context);
         }
     }
 }
