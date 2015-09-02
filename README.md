@@ -7,12 +7,9 @@ Minimalbeispiel für die Authentifizierung mittels OAuth bei Benutzung der Web A
 Folgende Docker-Kommandos ausführen
 
 	docker build -t owin-test . 
-	docker run --rm owin-test
+	docker run --rm -p 9001:9001 owin-test
 
 wobei `owin-test` ein beliebiger Name für das neue Image ist.
-Als Einzeiler:
-
-	docker build -t owin-test . && docker run --rm owin-test
 
 ## Fallstricke
 

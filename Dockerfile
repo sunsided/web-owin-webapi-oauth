@@ -1,2 +1,2 @@
 FROM mono:onbuild
-CMD [ "mono",  "./main.exe" ]
+CMD [ "mono",  "./auth.exe" ]
