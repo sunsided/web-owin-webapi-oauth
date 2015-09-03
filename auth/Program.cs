@@ -117,7 +117,7 @@ namespace auth
         private static async Task<HttpStatusCode> TestRequestToken([NotNull] string baseAddress, [NotNull] string audienceId)
         {
             // Create HttpCient and make a request to api/values
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var request = new FormUrlEncodedContent(new []
                                                             {

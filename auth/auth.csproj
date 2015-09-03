@@ -126,6 +126,7 @@
     <Compile Include="Controllers\AudienceController.cs" />
     <Compile Include="Entities\Audience.cs" />
     <Compile Include="Formats\CustomJwtFormat.cs" />
+    <Compile Include="LoggingHandler.cs" />
     <Compile Include="Models\AudienceModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
