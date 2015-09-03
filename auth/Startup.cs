@@ -28,6 +28,9 @@ namespace auth
         {
             var config = new HttpConfiguration();
 
+            // Default-Authentisierung (Cookie, ...) unterbinden
+            config.SuppressDefaultHostAuthentication();
+
             /*
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             var traceWriter = config.EnableSystemDiagnosticsTracing();
@@ -42,13 +45,16 @@ namespace auth
             var encryptionKey = "my super secret encryption key"; // TODO: Key konfigurieren
             appBuilder.UseAesDataProtectorProvider(encryptionKey);
 
-            ConfigureOAuth(appBuilder);
-
-            // Web API routes
+            // Web API routes anhand der Attribute
             config.MapHttpAttributeRoutes();
 
+            // Cross-Site Requests erlauben
             appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 
+            // OAuth konfigurieren
+            ConfigureOAuth(appBuilder);
+
+            // Und WebAPI verwenden
             appBuilder.UseWebApi(config);
 
         }
