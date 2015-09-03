@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Protocols.WSTrust;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
@@ -41,28 +43,55 @@ namespace auth
                 var baseAddress = $"http://localhost:{port}/";
                 var newAudienceName = "Something 9000";
 
-                PrintStatusMessage("Attempting to retrieve a bearer token for sample audience ...", false);
+                PrintStatusMessage("OAuth: Attempting to retrieve a bearer token for sample audience ...", false);
                 var requestTask = TestRequestToken(baseAddress, audienceId: "099153c2625149bc8ecb3e85e03f0022");
                 requestTask.Wait();
+                ExpectResult(requestTask.Result, HttpStatusCode.OK);
 
-                PrintStatusMessage($"Attempting to register new audience '{newAudienceName}' ...");
+                PrintStatusMessage($"API: Attempting to register new audience '{newAudienceName}' ...");
                 var registerTask = TestApi(baseAddress, newAudienceName);
                 registerTask.Wait();
-                var audience = registerTask.Result;
+                ExpectResult(registerTask.Result.Item1, HttpStatusCode.OK);
+                var audience = registerTask.Result.Item2;
 
                 if (audience != null)
                 {
-                    PrintStatusMessage($"Attempting to retrieve a bearer token for audience '{audience.Name}' ...");
+                    PrintStatusMessage($"OAuth: Attempting to retrieve a bearer token for audience '{audience.Name}' ...");
                     requestTask = TestRequestToken(baseAddress, audienceId: audience.ClientId);
                     requestTask.Wait();
+                    ExpectResult(requestTask.Result, HttpStatusCode.OK);
                 }
 
-                PrintStatusMessage("Attempting to retrieve a bearer token for a non-existing audience ...");
+                PrintStatusMessage("OAuth: Attempting to retrieve a bearer token for a non-existing audience ...");
                 requestTask = TestRequestToken(baseAddress, audienceId: "something I just made up");
                 requestTask.Wait();
+                ExpectResult(requestTask.Result, HttpStatusCode.BadRequest);
 
                 Console.ReadKey(true);
             }
+        }
+
+        /// <summary>
+        /// Gibt eine Fehler- oder Erfolgsmeldung aus
+        /// </summary>
+        /// <param name="statusCode">The status code.</param>
+        /// <param name="expectedCode">The expected code.</param>
+        private static void ExpectResult(HttpStatusCode statusCode, HttpStatusCode expectedCode)
+        {
+            if (statusCode == expectedCode)
+            {
+                Console.BackgroundColor = ConsoleColor.DarkGreen;
+                Console.ForegroundColor = ConsoleColor.Black;
+                Console.Write($"OK - Erwartet: {expectedCode}, erhalten: {statusCode}");
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.DarkRed;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"Fehler - Erwartet: {expectedCode}, erhalten: {statusCode}");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -85,7 +114,7 @@ namespace auth
         /// <param name="audienceId">The audience identifier.</param>
         /// <returns>The task that represents this operation.</returns>
         [NotNull]
-        private static async Task TestRequestToken([NotNull] string baseAddress, [NotNull] string audienceId)
+        private static async Task<HttpStatusCode> TestRequestToken([NotNull] string baseAddress, [NotNull] string audienceId)
         {
             // Create HttpCient and make a request to api/values
             using (var client = new HttpClient())
@@ -105,6 +134,8 @@ namespace auth
 
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
+
+                return response.StatusCode;
             }
         }
 
@@ -115,7 +146,7 @@ namespace auth
         /// <param name="friendlyName">The friendly name of the <see cref="Audience"/>.</param>
         /// <returns>The task that represents this operation.</returns>
         [NotNull]
-        private static async Task<Audience> TestApi([NotNull] string baseAddress, [NotNull] string friendlyName)
+        private static async Task<Tuple<HttpStatusCode, Audience>> TestApi([NotNull] string baseAddress, [NotNull] string friendlyName)
         {
             // Create HttpCient and make a request to api/values
             using (var client = new HttpClient())
@@ -133,13 +164,10 @@ namespace auth
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonConvert.DeserializeObject<Audience>(content);
-                }
+                return Tuple.Create(
+                    response.StatusCode,
+                    response.IsSuccessStatusCode ? JsonConvert.DeserializeObject<Audience>(content) : null);
             }
-
-            return null;
         }
     }
 }

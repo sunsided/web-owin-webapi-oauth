@@ -27,7 +27,7 @@ namespace auth
         public void Configuration([NotNull] IAppBuilder appBuilder)
         {
             var config = new HttpConfiguration();
-	
+
             /*
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             var traceWriter = config.EnableSystemDiagnosticsTracing();
@@ -42,10 +42,10 @@ namespace auth
             var encryptionKey = "my super secret encryption key"; // TODO: Key konfigurieren
             appBuilder.UseAesDataProtectorProvider(encryptionKey);
 
+            ConfigureOAuth(appBuilder);
+
             // Web API routes
             config.MapHttpAttributeRoutes();
-
-            ConfigureOAuth(appBuilder);
 
             appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 
